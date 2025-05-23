@@ -52,7 +52,7 @@ I token JWT vengono utilizzati per autenticare gli utenti e scambiati con tutti 
 | sub   | Identificatore utente (id)       |
 | iat   | Data creazione (Unix timestamp)  |
 | exp   | Data scadenza (Unix timestamp)   |
-| role  | Ruolo utente (`sadmin`, `admin`, `teach`, `user`) |
+| role  | Ruolo utente (`sadmin`, `admin`, `teach`, `student`) |
 
 Le richieste devono includere l'header:
 ```
