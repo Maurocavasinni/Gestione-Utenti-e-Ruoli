@@ -43,7 +43,7 @@ RabbitMQ è previsto come sistema di comunicazione (da valutare).
 
 ## JWT Authentication
 
-I token JWT vengono utilizzati per autenticare gli utenti.
+I token JWT vengono utilizzati per autenticare gli utenti e scambiati con tutti i microservizi del sistema.
 
 ### Payload del Token
 
@@ -58,7 +58,12 @@ Le richieste devono includere l'header:
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
-### Esempio di Token
+### Esempio contenuto del Token
+
+Il Token JWT è un file JSON che si presenta come segue. Tramite il payload è possibile ottenere le tre infomazioni principali per il riconoscimento utente:
+- Id utente univoco
+- Ruolo utente (ad ogni utente viene assegnato solo un ruolo)
+- Timestamp unix di scadenza del token (3600 secondi dopo la creazione)
 
 ```
 {
