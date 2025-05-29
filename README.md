@@ -68,7 +68,7 @@ Il Token JWT è un file JSON che si presenta come segue. Tramite il payload è p
 ```
 {
   "header": {
-    "alg": "HS256",
+    "alg": "RS256",
     "typ": "JWT"
   },
   "payload": {
