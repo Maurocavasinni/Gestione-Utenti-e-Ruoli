@@ -45,12 +45,6 @@ RabbitMQ è previsto come sistema di comunicazione (da valutare).
 
 I token JWT vengono utilizzati per autenticare gli utenti e scambiati con tutti i microservizi del sistema.
 
-### Payload del Token
-
-Le richieste devono includere l'header:
-```
-Authorization: Bearer <hash del TOKEN>
-```
 ### Esempio contenuto del Token
 
 Il Token JWT è un file JSON che si presenta come segue. Tramite il payload è possibile ottenere le tre infomazioni principali per il riconoscimento utente:
@@ -74,13 +68,25 @@ Il Token JWT è un file JSON che si presenta come segue. Tramite il payload è p
   "signature": "RwJ6KU8X8DQ9ImTD6O4RrmlQ9znzVz1dAQuvG3k9KZ4"
 }
 ```
+### Payload del Token
 
 | Campo | Descrizione |
 |-------|-------------|
 | sub   | Identificatore utente (matricola)       |
 | iat   | Data creazione (Unix timestamp)  |
 | exp   | Data scadenza (Unix timestamp)   |
+| username   | Nome e Cognome utente              |
 | role  | Ruolo utente (`sadmin`, `admin`, `teach`, `student`) |
+
+### Postman & Co.
+
+Se si vuole testare il codice del token (fornito sul gruppo Discord), tenere a mente che le richieste devono includere l'header:
+```
+Authorization: Bearer <hash del TOKEN>
+
+Ex:
+Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxNzA2OTAiLCJpYXQiOjE3NDg1OTY1NDksImV4cCI6MTc0ODYwMDE0OSwicm9sZSI6ImFkbWluIn0.wFoSClyfi8DTFyedFmLuVm8Lrb4NrbRAzDLbaNiKNw479PzdMWGuJs_UkUOv_WoqB1ootWyk2BMr5D3gmm_RzdA172VH5JBkTb2L5qMCmPQkr2eHjTgNalc6yCbDw2BmV5xZ1rcYFeKo4aPB7xNwcTKUs-HHwLQ3tN2eYIaHe_L42iMuyDkAI8QvQLUahVhBG6SKwE3DrZ6SMYnHG6JCLfCqQzGqKRwglEZes8H-wXyKUzgHqTb5muRbzNT1OB0gIt46kXZacOLyOiSLwzaqGG1f3-GLGsW7Y8N3QE9n_aCBN1f7r4BbBIATtQ6aUB8t-u4mmRhj9vMx5hMvYycuUQ
+```
 
 ## API Endpoints
 
