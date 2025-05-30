@@ -47,21 +47,14 @@ I token JWT vengono utilizzati per autenticare gli utenti e scambiati con tutti 
 
 ### Payload del Token
 
-| Campo | Descrizione |
-|-------|-------------|
-| sub   | Identificatore utente (id)       |
-| iat   | Data creazione (Unix timestamp)  |
-| exp   | Data scadenza (Unix timestamp)   |
-| role  | Ruolo utente (`sadmin`, `admin`, `teach`, `student`) |
-
 Le richieste devono includere l'header:
 ```
-Authorization: Bearer <JWT_TOKEN>
+Authorization: Bearer <hash del TOKEN>
 ```
 ### Esempio contenuto del Token
 
 Il Token JWT è un file JSON che si presenta come segue. Tramite il payload è possibile ottenere le tre infomazioni principali per il riconoscimento utente:
-- Id utente univoco
+- Id utente univoco (matricola)
 - Ruolo utente (ad ogni utente viene assegnato solo un ruolo)
 - Timestamp unix di scadenza del token (3600 secondi dopo la creazione)
 
@@ -75,11 +68,19 @@ Il Token JWT è un file JSON che si presenta come segue. Tramite il payload è p
     "sub": "178001",
     "iat": 1716470423,
     "exp": 1716474023,
+    "username": "mauro.cavasinni",
     "role": "admin"
   },
   "signature": "RwJ6KU8X8DQ9ImTD6O4RrmlQ9znzVz1dAQuvG3k9KZ4"
 }
 ```
+
+| Campo | Descrizione |
+|-------|-------------|
+| sub   | Identificatore utente (matricola)       |
+| iat   | Data creazione (Unix timestamp)  |
+| exp   | Data scadenza (Unix timestamp)   |
+| role  | Ruolo utente (`sadmin`, `admin`, `teach`, `student`) |
 
 ## API Endpoints
 
