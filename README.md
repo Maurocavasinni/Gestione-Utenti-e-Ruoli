@@ -80,7 +80,7 @@ Il Token JWT è un file JSON che si presenta come segue. Tramite il payload è p
 
 ### Postman & Co.
 
-Se si vuole testare il codice del token (fornito sul gruppo Discord), tenere a mente che le richieste devono includere l'header:
+Se si vuole testare la stab del token (fornito sul gruppo Discord), tenere a mente che le richieste devono includere l'header:
 ```
 Authorization: Bearer <hash del TOKEN>
 
