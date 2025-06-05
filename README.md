@@ -118,7 +118,7 @@ Nessun permesso specifico per ruolo Docente
 |--------|------------------------|----------------------------------------|------------------------------------------------------|----------------------------------------|
 | POST   | /auth/login            | username, password                      | Token JWT                                            | Login utente                           |
 | POST   | /auth/logout           | Token JWT                               | void                                                 | Logout utente                          |
-| POST   | /refresh-token         | Token JWT                               | Token JWT                                            | Rinnovo scadenza token                 |
+| POST   | /auth/refresh-token         | Token JWT                               | Token JWT                                            | Rinnovo scadenza token                 |
 | GET    | /users/profile         | Token JWT                               | IdUtente, username, email, nome, cognome, dataCreazione, ultimoLogin | Visualizza profilo utente  |
 | PUT    | /users/profile         | email, nome, cognome                    | Id, username, email, nome, cognome                   | Modifica profilo utente                |
 | POST   | /users/forgot-password | email                                   | void                                                 | Reset password utente                  |
