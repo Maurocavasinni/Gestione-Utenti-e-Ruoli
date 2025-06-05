@@ -94,7 +94,7 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxNzA2OTAiLCJpYXQiOjE3NDg1O
 
 | Metodo | Endpoint            | Input                        | Output  | Descrizione                         |
 |--------|---------------------|------------------------------|---------|-------------------------------------|
-| POST   | /init/superadmin    | username, email, password    | boolean | Crea account Super Admin se assente |
+| POST   | /users/init/superadmin    | username, email, password    | boolean | Crea account Super Admin se assente |
 
 ### Admin+
 
