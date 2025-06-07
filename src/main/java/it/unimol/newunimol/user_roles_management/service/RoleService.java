@@ -66,7 +66,7 @@ public class RoleService {
         return RoleLevelEnum.fromRoleName(userRole).getLevel() >= requiredRole.getLevel();
     }
 
-    public boolean assignRoleToUser(String userId, String roleId) throws UnknownUserException {
+    public boolean assignRole(String userId, String roleId) throws UnknownUserException {
         //TODO: Implementare metodo
         return true;
     }

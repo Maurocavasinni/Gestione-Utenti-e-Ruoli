@@ -145,7 +145,7 @@ public class UserController {
     public ResponseEntity<Boolean> assignRole(@RequestHeader TokenJWTDto token, @PathVariable String id, @RequestBody RoleAssignmentDto role) {
         try {
             roleService.checkRole(token.token(), RoleLevelEnum.ADMIN);
-            boolean result = roleService.assignRoleToUser(id, role.id());
+            boolean result = roleService.assignRole(id, role.id());
             return ResponseEntity.ok(result);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
