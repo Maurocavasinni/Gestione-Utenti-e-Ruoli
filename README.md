@@ -92,14 +92,13 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxNzA2OTAiLCJpYXQiOjE3NDg1O
 
 ### Super Admin
 
-| Metodo | Endpoint            | Input                        | Output  | Descrizione                         |
-|--------|---------------------|------------------------------|---------|-------------------------------------|
-| POST   | /users/init/superadmin    | username, email, password    | boolean | Crea account Super Admin se assente |
+Nessun permesso specifico per ruolo Super Admin
 
 ### Admin+
 
 | Metodo | Endpoint             | Input                                     | Output                                         | Descrizione                         |
 |--------|----------------------|-------------------------------------------|------------------------------------------------|-------------------------------------|
+| POST   | /users/init/superadmin    | username, email, password            | boolean                                 | Crea account Super Admin se assente |
 | POST   | /users               | username, email, password, nome, cognome, idRuolo | boolean                        | Creazione nuovo utente              |
 | PUT    | /users/{id}          | email, nome, cognome                      | username, email, nome, cognome, ruolo | Modifica utente                         |
 | GET    | /users/{id}          | (id nell’URL)                             | IdUtente, username, email, nome, cognome, ruolo, dataCreazione, ultimoLogin | Visualizzazione utente             |
@@ -121,6 +120,6 @@ Nessun permesso specifico per ruolo Docente
 | POST   | /auth/refresh-token         | Token JWT                               | Token JWT                                            | Rinnovo scadenza token                 |
 | GET    | /users/profile         | Token JWT                               | IdUtente, username, email, nome, cognome, dataCreazione, ultimoLogin | Visualizza profilo utente  |
 | PUT    | /users/profile         | email, nome, cognome                    | Id, username, email, nome, cognome                   | Modifica profilo utente                |
-| POST   | /users/forgot-password | email                                   | void                                                 | Reset password utente                  |
+| POST   | /users/reset-password | email                                   | void                                                 | Reset password utente                  |
 | PUT    | /users/change-password | currentPassword, newPassword            | boolean                                              | Modifica password                      |
 
