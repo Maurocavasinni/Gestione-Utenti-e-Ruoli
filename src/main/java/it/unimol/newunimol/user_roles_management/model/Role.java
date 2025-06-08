@@ -15,6 +15,8 @@ public class Role {
     @Column(name = "descrizione", length = 500)
     private String descrizione;
 
+    public Role() {}
+
     public Role(String id, String nome, String descrizione) {
         this.id = id;
         this.nome = nome;

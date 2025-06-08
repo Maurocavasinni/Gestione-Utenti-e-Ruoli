@@ -1,9 +1,11 @@
 package it.unimol.newunimol.user_roles_management.service;
 
-import it.unimol.newunimol.user_roles_management.dto.UserDto;
+import it.unimol.newunimol.user_roles_management.dto.UserCreationDto;
 import it.unimol.newunimol.user_roles_management.dto.UserProfileDto;
+import it.unimol.newunimol.user_roles_management.dto.UserDto;
 import it.unimol.newunimol.user_roles_management.dto.converter.UserConverter;
 import it.unimol.newunimol.user_roles_management.exceptions.UnknownUserException;
+import it.unimol.newunimol.user_roles_management.exceptions.InvalidRequestException;
 import it.unimol.newunimol.user_roles_management.model.Role;
 import it.unimol.newunimol.user_roles_management.model.User;
 import it.unimol.newunimol.user_roles_management.util.PasswordUtils;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import it.unimol.newunimol.user_roles_management.repository.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,10 +27,10 @@ public class UserService {
     @Autowired
     private TokenJWTService tokenJWTService;
 
-    public boolean createSuperAdminIfNotExists(UserDto request) {
-        Optional<User> existsSuperAdmin = userRepository.findByNomeRuolo("SUPER_ADMIN");
-        if (existsSuperAdmin.isPresent()) {
-            return false;
+    public UserDto createSuperAdminIfNotExists(UserCreationDto request) throws InvalidRequestException {
+        List<User> superAdmins = userRepository.findByNomeRuolo("SUPER_ADMIN");
+        if (!superAdmins.isEmpty()) {
+            throw new InvalidRequestException("SuperAdmin già esistente");
         }
 
         User superAdmin = new User("000000", request.username(), request.email(), request.name(),
@@ -37,16 +40,16 @@ public class UserService {
         superAdmin.setRole(superAdminRole.get());
         userRepository.save(superAdmin);
 
-        return true;
+        return userConverter.toDto(superAdmin);
     }
 
     public boolean existsUserId(String id) {
-        Optional<User> user = userRepository.findByMatricola(id);
+        Optional<User> user = userRepository.findById(id);
         return user.isPresent();
     }
 
     public UserDto findByUserId(String id) throws UnknownUserException {
-        Optional<User> user = userRepository.findByMatricola(id);
+        Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             throw new UnknownUserException("Username non trovato");
         }
@@ -62,7 +65,7 @@ public class UserService {
     }
 
     public UserDto updateUser(String userId, User userData) throws UnknownUserException {
-        Optional<User> userTemp = userRepository.findByMatricola(userId);
+        Optional<User> userTemp = userRepository.findById(userId);
         if (userTemp.isEmpty()) {
             throw new UnknownUserException("Utente non trovato.");
         }
@@ -79,7 +82,7 @@ public class UserService {
     }
 
     public boolean deleteUser(String userId) {
-        Optional<User> user = userRepository.findByMatricola(userId);
+        Optional<User> user = userRepository.findById(userId);
         if (user.isPresent()) {
             userRepository.delete(user.get());
             return true;
@@ -89,7 +92,7 @@ public class UserService {
 
     public UserProfileDto getUserProfile(String token) throws UnknownUserException {
         String userId = tokenJWTService.extractUserId(token);
-        Optional<User> userTemp = userRepository.findByMatricola(userId);
+        Optional<User> userTemp = userRepository.findById(userId);
         if (userTemp.isEmpty()) {
             throw new UnknownUserException("Utente non trovato");
         }
@@ -109,7 +112,7 @@ public class UserService {
 
     public void updateUserProfile(String token, User userData) throws UnknownUserException {
         String userId = tokenJWTService.extractUserId(token);
-        Optional<User> userTemp = userRepository.findByMatricola(userId);
+        Optional<User> userTemp = userRepository.findById(userId);
         if (userTemp.isEmpty()) {
             throw new UnknownUserException("Utente non trovato");
         }
@@ -125,7 +128,7 @@ public class UserService {
 
     public void resetPassword(String token, String oldPassword) throws UnknownUserException {
         String userId = tokenJWTService.extractUserId(token);
-        Optional<User> userTemp = userRepository.findByMatricola(userId);
+        Optional<User> userTemp = userRepository.findById(userId);
         if (userTemp.isEmpty()) {
             throw new UnknownUserException("Utente non trovato");
         }
@@ -142,7 +145,7 @@ public class UserService {
 
     public boolean changePassword(String token, String oldPassword, String newPassword) throws UnknownUserException {
         String userId = tokenJWTService.extractUserId(token);
-        Optional<User> userTemp = userRepository.findByMatricola(userId);
+        Optional<User> userTemp = userRepository.findById(userId);
         if (userTemp.isEmpty()) {
             throw new UnknownUserException("Utente non trovato");
         }

@@ -34,6 +34,8 @@ public class User {
     @JoinColumn(name = "ruolo_id", nullable = false)
     private Role ruolo;
 
+    public User() {}
+
     public User(String id, String username, String email, String name, String surname, String password, Role ruolo) {
         this.id = id;
         this.username = username;
@@ -137,22 +139,5 @@ public class User {
 
     public void setLastLogin(Long lastLogin) {
         this.lastLogin = System.currentTimeMillis();
-    }
-
-    // TODO: Verficare se tenerli qui è utile a migliorare le prestazioni
-    public boolean isSuperAdmin() {
-        return this.ruolo != null && this.ruolo.isSuperAdmin();
-    }
-    
-    public boolean isAdmin() {
-        return this.ruolo != null && (this.ruolo.isAdmin() || this.ruolo.isSuperAdmin());
-    }
-    
-    public boolean isTeacher() {
-        return this.ruolo != null && this.ruolo.isTeacher();
-    }
-    
-    public boolean isStudent() {
-        return this.ruolo != null && this.ruolo.isStudent();
     }
 }

@@ -71,7 +71,7 @@ public class RoleService {
     }
 
     public boolean assignRole(String userId, String roleId) throws IllegalArgumentException {
-        Optional<User> userTemp = userRepository.findByMatricola(userId);
+        Optional<User> userTemp = userRepository.findById(userId);
         Optional<Role> roleTemp = roleRepository.findByNome(roleId);
 
         if (userTemp.isEmpty() || roleTemp.isEmpty()) {

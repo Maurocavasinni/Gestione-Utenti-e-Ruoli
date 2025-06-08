@@ -2,9 +2,11 @@ package it.unimol.newunimol.user_roles_management.controller;
 
 import it.unimol.newunimol.user_roles_management.dto.*;
 import it.unimol.newunimol.user_roles_management.dto.converter.UserConverter;
+import it.unimol.newunimol.user_roles_management.dto.converter.UserCreationConverter;
 import it.unimol.newunimol.user_roles_management.exceptions.InvalidIdException;
 import it.unimol.newunimol.user_roles_management.service.AuthService;
 import it.unimol.newunimol.user_roles_management.service.RoleService;
+import it.unimol.newunimol.user_roles_management.service.TokenJWTService;
 import it.unimol.newunimol.user_roles_management.util.RoleLevelEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,42 +22,39 @@ public class UserController {
     @Autowired
     private UserConverter userConverter;
     @Autowired
+    private UserCreationConverter userCreationConverter;
+    @Autowired
     private UserService userService;
     @Autowired
     private RoleService roleService;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private TokenJWTService tokenJWTService;
 
     @PostMapping("/init/superadmin")
-    public ResponseEntity<Boolean> createSuperAdmin(@RequestHeader TokenJWTDto token, @RequestBody UserDto request) {
+    public ResponseEntity<UserDto> createSuperAdmin(@RequestBody UserCreationDto request) {
         try {
-            roleService.checkRole(token.token(), RoleLevelEnum.ADMIN);
-            boolean result = userService.createSuperAdminIfNotExists(request);
-            return ResponseEntity.ok(result);
+            UserDto newUser = userService.createSuperAdminIfNotExists(request);
+            return ResponseEntity.ok(newUser);
         } catch (SecurityException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(false);
+            return ResponseEntity.badRequest().build();
         }
     }
     
     @PostMapping
-    public ResponseEntity<Boolean> createNewUser(@RequestHeader TokenJWTDto token, @RequestBody UserDto request) {
+    public ResponseEntity<UserDto> createNewUser(@RequestHeader TokenJWTDto token, @RequestBody UserCreationDto request) {
         try {
             roleService.checkRole(token.token(), RoleLevelEnum.ADMIN);
-            User user = userConverter.convert(request);
-            if (!userService.existsUserId(user.getId())) {
-                authService.register(user);
-                return ResponseEntity.ok(true);
-            } else {
-                throw new InvalidIdException("Id già in uso da un altro utente");
-            }
+            User user = userCreationConverter.convert(request);
+            authService.register(user);
+            return ResponseEntity.ok(userConverter.toDto(user));
         } catch (SecurityException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
-        } catch (InvalidIdException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(false);
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -90,6 +89,9 @@ public class UserController {
     public ResponseEntity<Boolean> deleteUser(@RequestHeader TokenJWTDto token, @PathVariable String id) {
         try {
             roleService.checkRole(token.token(), RoleLevelEnum.ADMIN);
+            if (tokenJWTService.extractUserId(token.token()).equals(id)) {
+                throw new InvalidIdException("Richiesta non valida.");
+            }
             boolean result = userService.deleteUser(id);
             return ResponseEntity.ok(result);
         } catch (SecurityException e) {
