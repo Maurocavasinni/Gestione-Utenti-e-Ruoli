@@ -25,7 +25,7 @@ public class UserCreationConverter implements Converter<UserCreationDto, User> {
             return null;
         }
 
-        RoleDto ruolo = roleService.findByName(source.role());
+        RoleDto ruolo = roleService.findById(source.role());
         String randomId = String.valueOf(100000 + random.nextInt(900000));
 
         return new User(randomId, source.username(), source.email(), source.name(), source.surname(),

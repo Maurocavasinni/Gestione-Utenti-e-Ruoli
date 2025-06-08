@@ -24,23 +24,27 @@ public class AuthController {
         } catch (AuthException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } catch (Exception e) {
+            System.err.println("Eccezione catturata: " + e.getClass().getSimpleName() + " - " + e.getMessage());
             return ResponseEntity.badRequest().body(null);
         }
     }
 
     // Valutare se mantenere, il logout normalmente è gestito lato client
     @PostMapping("/logout")
-    public void logout (@RequestHeader TokenJWTDto token) {
-        authService.logout(token.token());
+    public void logout (@RequestHeader ("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        authService.logout(token);
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<TokenJWTDto> refreshToken(@RequestHeader TokenJWTDto token) {
+    public ResponseEntity<TokenJWTDto> refreshToken(@RequestHeader ("Authorization") String authHeader) {
         try {
-            TokenJWTDto newToken = authService.refreshToken(token.token());
+            String token = authHeader.replace("Bearer ", "");
+            TokenJWTDto newToken = authService.refreshToken(token);
             return ResponseEntity.ok(newToken);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            System.err.println("Eccezione catturata: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 }

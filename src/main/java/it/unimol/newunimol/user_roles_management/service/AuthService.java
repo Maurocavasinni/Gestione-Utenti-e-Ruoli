@@ -37,7 +37,7 @@ public class AuthService {
                 user.setLastLogin(System.currentTimeMillis());
 
                 userRepository.save(user);
-                return tokenService.generateToken(user.getId(), user.getUsername(), user.getRoleName());
+                return tokenService.generateToken(user.getId(), user.getUsername(), user.getRole().getId());
             }
         }
         throw new AuthException("Username o password non valida");

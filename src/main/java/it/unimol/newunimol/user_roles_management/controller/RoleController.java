@@ -17,13 +17,14 @@ public class RoleController {
     private RoleService roleService;
 
     @GetMapping("/roles")
-    public ResponseEntity<List<RoleDto>> getAllRoles(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<List<RoleDto>> getAllRoles(@RequestHeader ("Authorization") String authHeader) {
         try {
             String token = authHeader.replace("Bearer ", "");
             roleService.checkRole(token, RoleLevelEnum.ADMIN);
             List<RoleDto> ruoli = roleService.getAllRoles();
             return ResponseEntity.ok(ruoli);
         } catch (Exception e) {
+            System.err.println("Eccezione catturata: " + e.getClass().getSimpleName() + " - " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

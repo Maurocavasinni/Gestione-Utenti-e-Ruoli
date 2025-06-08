@@ -34,8 +34,8 @@ public class RoleService {
                 .collect(Collectors.toList());
     }
 
-    public RoleDto findByName(String roleName) {
-        Optional<Role> role = roleRepository.findByNome(roleName);
+    public RoleDto findById(String roleId) {
+        Optional<Role> role = roleRepository.findById(roleId);
         return role.map(roleConverter::toDto).orElse(null);
     }
 
@@ -60,6 +60,7 @@ public class RoleService {
         }
 
         String userRole = tokenService.extractRole(token);
+        System.out.println("Ho estratto il ruolo: " + userRole);
 
         if (!hasPermission(userRole, role)) {
             throw new SecurityException("Permessi insufficienti per questa operazione.");
