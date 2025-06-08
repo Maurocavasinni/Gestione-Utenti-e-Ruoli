@@ -34,7 +34,7 @@ public class UserService {
         }
 
         User superAdmin = new User("000000", request.username(), request.email(), request.name(),
-                                    request.surname(), request.password(), null);
+                                    request.surname(), PasswordUtils.hashPassword(request.password()), null);
 
         Optional<Role> superAdminRole = roleRepository.findByNome("SUPER_ADMIN");
         superAdmin.setRole(superAdminRole.get());
