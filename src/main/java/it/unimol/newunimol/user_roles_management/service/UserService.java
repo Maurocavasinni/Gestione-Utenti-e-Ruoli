@@ -1,11 +1,12 @@
 package it.unimol.newunimol.user_roles_management.service;
 
 import it.unimol.newunimol.user_roles_management.dto.UserDto;
-import it.unimol.newunimol.user_roles_management.dto.UserResponseDto;
+import it.unimol.newunimol.user_roles_management.dto.UserProfileDto;
 import it.unimol.newunimol.user_roles_management.dto.converter.UserConverter;
 import it.unimol.newunimol.user_roles_management.exceptions.UnknownUserException;
 import it.unimol.newunimol.user_roles_management.model.Role;
 import it.unimol.newunimol.user_roles_management.model.User;
+import it.unimol.newunimol.user_roles_management.util.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import it.unimol.newunimol.user_roles_management.repository.*;
@@ -20,6 +21,8 @@ public class UserService {
     private RoleRepository roleRepository;
     @Autowired
     private UserConverter userConverter;
+    @Autowired
+    private TokenJWTService tokenJWTService;
 
     public boolean createSuperAdminIfNotExists(UserDto request) {
         Optional<User> existsSuperAdmin = userRepository.findByNomeRuolo("SUPER_ADMIN");
@@ -58,31 +61,100 @@ public class UserService {
         return userConverter.toDto(user.get());
     }
 
-    public UserDto updateUser(String id, User user) throws UnknownUserException {
-        //TODO: Implementare il metodo
-        return null;
+    public UserDto updateUser(String userId, User userData) throws UnknownUserException {
+        Optional<User> userTemp = userRepository.findByMatricola(userId);
+        if (userTemp.isEmpty()) {
+            throw new UnknownUserException("Utente non trovato.");
+        }
+        User user = userTemp.get();
+
+        user.setUsername(userData.getUsername());
+        user.setEmail(userData.getEmail());
+        user.setName(userData.getName());
+        user.setSurname(userData.getSurname());
+        user.setPassword(userData.getPassword());
+
+        userRepository.save(user);
+        return userConverter.toDto(user);
     }
 
-    public boolean deleteUser(String id) {
-        //TODO: Implementare il metodo
-        return true;
+    public boolean deleteUser(String userId) {
+        Optional<User> user = userRepository.findByMatricola(userId);
+        if (user.isPresent()) {
+            userRepository.delete(user.get());
+            return true;
+        }
+        return false;
     }
 
-    public UserResponseDto getUserProfile(String token) throws UnknownUserException {
-        //TODO: Implementare il metodo
-        return null;
+    public UserProfileDto getUserProfile(String token) throws UnknownUserException {
+        String userId = tokenJWTService.extractUserId(token);
+        Optional<User> userTemp = userRepository.findByMatricola(userId);
+        if (userTemp.isEmpty()) {
+            throw new UnknownUserException("Utente non trovato");
+        }
+
+        User user = userTemp.get();
+        return new UserProfileDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getName(),
+                user.getSurname(),
+                user.getRoleName(),
+                user.getCreationDate(),
+                user.getLastLogin()
+        );
     }
 
-    public void updateUserProfile(String token, User user) throws UnknownUserException {
-        //TODO: Implementare il metodo
+    public void updateUserProfile(String token, User userData) throws UnknownUserException {
+        String userId = tokenJWTService.extractUserId(token);
+        Optional<User> userTemp = userRepository.findByMatricola(userId);
+        if (userTemp.isEmpty()) {
+            throw new UnknownUserException("Utente non trovato");
+        }
+
+        User user = userTemp.get();
+        user.setUsername(userData.getUsername());
+        user.setEmail(userData.getEmail());
+        user.setName(userData.getName());
+        user.setSurname(userData.getSurname());
+
+        userRepository.save(user);
     }
 
-    public void resetPassword(String token, String email) throws UnknownUserException {
-        //TODO: Implementare il metodo
+    public void resetPassword(String token, String oldPassword) throws UnknownUserException {
+        String userId = tokenJWTService.extractUserId(token);
+        Optional<User> userTemp = userRepository.findByMatricola(userId);
+        if (userTemp.isEmpty()) {
+            throw new UnknownUserException("Utente non trovato");
+        }
+
+        User user = userTemp.get();
+        if (!PasswordUtils.verificaPassword(user.getPassword(), oldPassword)) {
+            throw new SecurityException("Password errata");
+        }
+
+        String tempPassword = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        user.setPassword(PasswordUtils.hashPassword(tempPassword));
+        userRepository.save(user);
     }
 
     public boolean changePassword(String token, String oldPassword, String newPassword) throws UnknownUserException {
-        //TODO: Implementare il metodo
+        String userId = tokenJWTService.extractUserId(token);
+        Optional<User> userTemp = userRepository.findByMatricola(userId);
+        if (userTemp.isEmpty()) {
+            throw new UnknownUserException("Utente non trovato");
+        }
+
+        User user = userTemp.get();
+        if (!PasswordUtils.verificaPassword(user.getPassword(), oldPassword)) {
+            return false;
+        }
+
+        user.setPassword(PasswordUtils.hashPassword(newPassword));
+        userRepository.save(user);
+
         return true;
     }
 }

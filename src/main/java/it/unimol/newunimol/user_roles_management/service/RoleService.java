@@ -4,7 +4,9 @@ import it.unimol.newunimol.user_roles_management.dto.RoleDto;
 import it.unimol.newunimol.user_roles_management.dto.converter.RoleConverter;
 import it.unimol.newunimol.user_roles_management.exceptions.UnknownUserException;
 import it.unimol.newunimol.user_roles_management.model.Role;
+import it.unimol.newunimol.user_roles_management.model.User;
 import it.unimol.newunimol.user_roles_management.repository.RoleRepository;
+import it.unimol.newunimol.user_roles_management.repository.UserRepository;
 import it.unimol.newunimol.user_roles_management.util.RoleLevelEnum;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ public class RoleService {
     private RoleConverter roleConverter;
     @Autowired
     private TokenJWTService tokenService;
+    @Autowired
+    private UserRepository userRepository;
 
     public List<RoleDto> getAllRoles() {
         List<Role> roles = roleRepository.findAll();
@@ -66,13 +70,23 @@ public class RoleService {
         return RoleLevelEnum.fromRoleName(userRole).getLevel() >= requiredRole.getLevel();
     }
 
-    public boolean assignRole(String userId, String roleId) throws UnknownUserException {
-        //TODO: Implementare metodo
-        return true;
-    }
+    public boolean assignRole(String userId, String roleId) throws IllegalArgumentException {
+        Optional<User> userTemp = userRepository.findByMatricola(userId);
+        Optional<Role> roleTemp = roleRepository.findByNome(roleId);
 
-    public boolean updateRoleForUser(String userId, String roleId) throws UnknownUserException {
-        //TODO: Implementare metodo
+        if (userTemp.isEmpty() || roleTemp.isEmpty()) {
+            throw new IllegalArgumentException("Parametro non valido");
+        }
+
+        User user = userTemp.get();
+        Role role = roleTemp.get();
+
+        if (user.getRole() != null && user.getRole().getId().equals(role.getId())) {
+            return false;
+        }
+
+        user.setRole(role);
+        userRepository.save(user);
         return true;
     }
 }

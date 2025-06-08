@@ -100,9 +100,9 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<UserResponseDto> getUserProfile(@RequestHeader TokenJWTDto token) {
+    public ResponseEntity<UserProfileDto> getUserProfile(@RequestHeader TokenJWTDto token) {
         try {
-            UserResponseDto profile = userService.getUserProfile(token.token());
+            UserProfileDto profile = userService.getUserProfile(token.token());
             return ResponseEntity.ok(profile);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -110,11 +110,11 @@ public class UserController {
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<UserResponseDto> updateUserProfile(@RequestHeader TokenJWTDto token, @RequestBody UserDto request) {
+    public ResponseEntity<UserProfileDto> updateUserProfile(@RequestHeader TokenJWTDto token, @RequestBody UserDto request) {
         try {
             User user = userConverter.convert(request);
             userService.updateUserProfile(token.token(), user);
-            UserResponseDto profile = userService.getUserProfile(token.token());
+            UserProfileDto profile = userService.getUserProfile(token.token());
             return ResponseEntity.ok(profile);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -122,9 +122,9 @@ public class UserController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(@RequestHeader TokenJWTDto token, @RequestBody ResetPasswordDto request) {
+    public ResponseEntity<Void> resetPassword(@RequestHeader TokenJWTDto token, @RequestBody ChangePasswordRequestDto request) {
         try {
-            userService.resetPassword(token.token(), request.email());
+            userService.resetPassword(token.token(), request.oldPassword());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -158,7 +158,7 @@ public class UserController {
     public ResponseEntity<Boolean> updateUserRoles(@RequestHeader TokenJWTDto token, @PathVariable String id, @RequestBody RoleAssignmentDto role) {
         try {
             roleService.checkRole(token.token(), RoleLevelEnum.ADMIN);
-            boolean result = roleService.updateRoleForUser(id, role.id());
+            boolean result = roleService.assignRole(id, role.id());
             return ResponseEntity.ok(result);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);

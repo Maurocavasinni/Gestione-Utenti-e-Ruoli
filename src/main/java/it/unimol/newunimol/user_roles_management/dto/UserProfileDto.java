@@ -1,6 +1,6 @@
 package it.unimol.newunimol.user_roles_management.dto;
 
-public record UserResponseDto(
+public record UserProfileDto(
         String id,
         String username,
         String email,
