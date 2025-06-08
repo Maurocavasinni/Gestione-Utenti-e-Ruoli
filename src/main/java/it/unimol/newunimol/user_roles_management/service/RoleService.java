@@ -60,7 +60,6 @@ public class RoleService {
         }
 
         String userRole = tokenService.extractRole(token);
-        System.out.println("Ho estratto il ruolo: " + userRole);
 
         if (!hasPermission(userRole, role)) {
             throw new SecurityException("Permessi insufficienti per questa operazione.");
