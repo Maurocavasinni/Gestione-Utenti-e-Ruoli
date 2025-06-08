@@ -91,7 +91,6 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }  catch (Exception e) {
             System.err.println("Eccezione catturata: " + e.getClass().getSimpleName() + " - " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -127,11 +126,10 @@ public class UserController {
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<UserProfileDto> updateUserProfile(@RequestHeader ("Authorization") String authHeader, @RequestBody UserDto request) {
+    public ResponseEntity<UserProfileDto> updateUserProfile(@RequestHeader ("Authorization") String authHeader, @RequestBody UserUpdaterDto request) {
         try {
             String token = authHeader.replace("Bearer ", "");
-            User user = userConverter.convert(request);
-            userService.updateUserProfile(token, user);
+            userService.updateUserProfile(token, request);
             UserProfileDto profile = userService.getUserProfile(token);
             return ResponseEntity.ok(profile);
         } catch (Exception e) {

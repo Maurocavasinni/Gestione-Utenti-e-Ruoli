@@ -73,7 +73,7 @@ public class RoleService {
 
     public boolean assignRole(String userId, String roleId) throws IllegalArgumentException {
         Optional<User> userTemp = userRepository.findById(userId);
-        Optional<Role> roleTemp = roleRepository.findByNome(roleId);
+        Optional<Role> roleTemp = roleRepository.findById(roleId);
 
         if (userTemp.isEmpty() || roleTemp.isEmpty()) {
             throw new IllegalArgumentException("Parametro non valido");

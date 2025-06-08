@@ -21,6 +21,10 @@ public class AuthService {
 
     public void register(User user) throws AuthException {
         try {
+            if (user.getRole().getId().equals("sadmin")) {
+                throw new AuthException("Ehh, volevi!");
+            }
+
             String password = PasswordUtils.hashPassword(user.getPassword());
             user.setPassword(password);
             userRepository.save(user);

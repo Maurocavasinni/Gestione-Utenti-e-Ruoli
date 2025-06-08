@@ -2,6 +2,7 @@ package it.unimol.newunimol.user_roles_management.service;
 
 import it.unimol.newunimol.user_roles_management.dto.UserCreationDto;
 import it.unimol.newunimol.user_roles_management.dto.UserProfileDto;
+import it.unimol.newunimol.user_roles_management.dto.UserUpdaterDto;
 import it.unimol.newunimol.user_roles_management.dto.UserDto;
 import it.unimol.newunimol.user_roles_management.dto.converter.UserConverter;
 import it.unimol.newunimol.user_roles_management.exceptions.UnknownUserException;
@@ -71,11 +72,12 @@ public class UserService {
         }
         User user = userTemp.get();
 
+        user.setId(userData.getId());
         user.setUsername(userData.getUsername());
         user.setEmail(userData.getEmail());
         user.setName(userData.getName());
         user.setSurname(userData.getSurname());
-        user.setPassword(userData.getPassword());
+        user.setPassword(PasswordUtils.hashPassword(userData.getPassword()));
 
         userRepository.save(user);
         return userConverter.toDto(user);
@@ -110,7 +112,7 @@ public class UserService {
         );
     }
 
-    public void updateUserProfile(String token, User userData) throws UnknownUserException {
+    public void updateUserProfile(String token, UserUpdaterDto userData) throws UnknownUserException {
         String userId = tokenJWTService.extractUserId(token);
         Optional<User> userTemp = userRepository.findById(userId);
         if (userTemp.isEmpty()) {
@@ -118,10 +120,9 @@ public class UserService {
         }
 
         User user = userTemp.get();
-        user.setUsername(userData.getUsername());
-        user.setEmail(userData.getEmail());
-        user.setName(userData.getName());
-        user.setSurname(userData.getSurname());
+        user.setUsername(userData.username());
+        user.setName(userData.name());
+        user.setSurname(userData.surname());
 
         userRepository.save(user);
     }
