@@ -9,10 +9,22 @@ Il servizio **Gestione Utenti e Ruoli** si occupa dell'autenticazione degli uten
 - Creazione Super Admin (inizializzazione)
 - Creazione nuovi utenti
 - Assegnazione e modifica ruoli
-- Autenticazione (Login)
+- Autenticazione
 - Modifica profilo utente
 - Visualizzazione utenti e ruoli
 - Rimozione utenti
+
+## Portda di Default
+
+```
+Server: http://localhost:23109
+```
+
+## Documentazione API
+
+```
+Swagger UI: http://localhost:23109/swagger-ui.html
+```
 
 ## Architettura del Database (PostgreSQL)
 
@@ -20,14 +32,15 @@ Il servizio **Gestione Utenti e Ruoli** si occupa dell'autenticazione degli uten
 
 | Campo         | Tipo    | Note                              |
 |---------------|---------|-----------------------------------|
-| Id            | String  | Identificatore univoco            |
+| Id            | String  | Identificatore univoco (6 cifre)  |
 | Username      | String  |                                   |
 | Email         | String  |                                   |
 | Nome          | String  |                                   |
 | Cognome       | String  |                                   |
-| Ruolo         | FK      | Chiave esterna verso tabella Ruoli |
+| Password      | String  | Password hashata con Argon2       |
 | DataCreazione | Long    | Timestamp                         |
 | UltimoLogin   | Long    | Timestamp                         |
+| Ruolo         | FK      | Chiave esterna verso tabella Ruoli |
 
 ### Tabella: Ruoli
 
@@ -37,13 +50,36 @@ Il servizio **Gestione Utenti e Ruoli** si occupa dell'autenticazione degli uten
 | Nome        | String |
 | Descrizione | String |
 
+### Ruoli Predefiniti
+
+| ID       | Nome         | Livello | Descrizione                                    |
+|----------|--------------|---------|------------------------------------------------|
+| `student`| STUDENTE     | 0       | Ruolo base per studenti                        |
+| `teach`  | DOCENTE      | 1       | Ruolo per docenti con permessi aggiuntivi      |
+| `admin`  | ADMIN        | 2       | Amministratore con gestione utenti             |
+| `sadmin` | SUPER_ADMIN  | 3       | Amministratore di sistema con tutti i privilegi |
+
 ## Comunicazione
 
-RabbitMQ è previsto come sistema di comunicazione (da valutare).
+È stato concordato l'utilizzo di **RabbitMQ** come sistema di messaggistica asincrono.
+Il servizio Gestione Utenti e Ruoli pubblica le modifiche al database come segue:
+```
+Exchange: users.exchange (Topic)
+├── user.created   → Notifica creazione utente
+├── user.updated   → Notifica aggiornamento utente  
+├── user.deleted   → Notifica eliminazione utente
+└── role.assigned  → Notifica assegnazione ruolo
+```
 
 ## JWT Authentication
 
 I token JWT vengono utilizzati per autenticare gli utenti e scambiati con tutti i microservizi del sistema.
+
+### Configurazione predefinita
+
+Nel file `application.properties` sono stati impostati i seguenti campi:
+- **Scadenza**: 3600 secondi (1 ora)
+- **Chiavi**: coppia pubblica-privata a 2048 bit codificata in formato Base64
 
 ### Esempio contenuto del Token
 
@@ -80,7 +116,11 @@ Il Token JWT è un file JSON che si presenta come segue. Tramite il payload è p
 
 ### Postman & Co.
 
-Se si vuole testare la stab del token (fornito sul gruppo Discord), tenere a mente che le richieste devono includere l'header:
+Si sconsiglia il testing tramite Swagger UI, poichè non comunica correttamente l'header alla Business Logic.
+Se si vuole testare lo stub del progetto (fornito sul gruppo Discord), seguire questi semplici passaggi:
+1. Il token, necessario per qualsiasi altra chiamata API, è ottibile contattando l'API `/auth/login`;
+2. Le successive richieste dovranno includere un header personalizzato con key: `Authorization` e value: `Bearer <hash del Token>`.
+
 ```
 Authorization: Bearer <hash del TOKEN>
 
