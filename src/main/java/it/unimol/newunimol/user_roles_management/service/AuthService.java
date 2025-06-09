@@ -18,7 +18,12 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
-
+    /**
+     * Registra un nuovo utente nel sistema.
+     * 
+     * @param user L'utente da registrare.
+     * @throws AuthException Se l'utente esiste già o se viene tentato di registrare un super admin.
+     */
     public void register(User user) throws AuthException {
         try {
             if (user.getRole().getId().equals("sadmin")) {
@@ -33,6 +38,15 @@ public class AuthService {
         }
     }
 
+    /**
+     * Effettua il login di un utente nel sistema.
+     * 
+     * @param username L'username dell'utente.
+     * @param password La password dell'utente.
+     * @return Un oggetto TokenJWTDto contenente il token JWT generato.
+     * @throws AuthException Se l'autenticazione fallisce a causa di credenziali non valide.
+     * @throws UnknownUserException Se l'utente non esiste nel sistema.
+     */
     public TokenJWTDto login(String username, String password) throws AuthException, UnknownUserException {
         Optional<User> existsUser = userRepository.findByUsername(username);
         if (existsUser.isPresent()) {
@@ -47,10 +61,22 @@ public class AuthService {
         throw new AuthException("Username o password non valida");
     }
 
+    /**
+     * Effettua il logout dell'utente invalidando il token.
+     * 
+     * @param token Il token JWT da invalidare.
+     */
     public void logout(String token) {
         tokenService.invalidateToken(token);
     }
 
+    /**
+     * Rinnova il token JWT dell'utente.
+     * 
+     * @param token Il token JWT da rinnovare.
+     * @return Un oggetto TokenJWTDto contenente il nuovo token JWT.
+     * @throws RuntimeException Se il rinnovo del token fallisce.
+     */
     public TokenJWTDto refreshToken(String token) throws RuntimeException {
         return tokenService.refreshToken(token);
     }

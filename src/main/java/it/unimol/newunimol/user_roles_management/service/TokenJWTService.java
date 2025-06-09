@@ -31,9 +31,14 @@ public class TokenJWTService {
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
-    // Mantenere per testing
     private static final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
 
+    /**
+     * Decifra e restituisce la chiave privata per la firma dei token JWT.
+     * 
+     * @return La chiave privata come oggetto PrivateKey.
+     * @throws RuntimeException Se la chiave privata non è in formato Base64 valido o se si verifica un errore durante la generazione della chiave.
+     */
     private PrivateKey getPrivateKey() {
         if (this.privateKey == null) {
             try {
@@ -50,6 +55,12 @@ public class TokenJWTService {
         return privateKey;
     }
 
+    /**
+     * Decifra e restituisce la chiave pubblica per la verifica dei token JWT.
+     * 
+     * @return La chiave pubblica come oggetto PublicKey.
+     * @throws RuntimeException Se la chiave pubblica non è in formato Base64 valido o se si verifica un errore durante la generazione della chiave.
+     */
     private PublicKey getPublicKey() {
         if (this.publicKey == null) {
             try {
@@ -71,6 +82,13 @@ public class TokenJWTService {
         return claimsResolver.apply(claims);
     }
 
+    /**
+     * Estrae tutti i claims dal token JWT.
+     * 
+     * @param token Il token JWT da cui estrarre i claims.
+     * @return Un oggetto Claims contenente tutti i claims del token.
+     * @throws RuntimeException Se il token non è valido o se si verifica un errore durante l'estrazione dei claims.
+     */
     private Claims extractAllClaims (String token) {
         return Jwts.parserBuilder()
             .setSigningKey(getPublicKey())
@@ -79,30 +97,74 @@ public class TokenJWTService {
             .getBody();
     }
 
+    /**
+     * Estrae l'ID utente dal token JWT.
+     * 
+     * @param token Il token JWT da cui estrarre l'ID utente.
+     * @return L'ID utente come stringa.
+     */
     public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
+    /**
+     * Estrae il nome utente dal token JWT.
+     * 
+     * @param token Il token JWT da cui estrarre il nome utente.
+     * @return Il nome utente come stringa.
+     */
     public String extractUsername(String token) {
         return extractClaim(token, claims -> claims.get("username", String.class));
     }
     
+    /**
+     * Estrae il ruolo dell'utente dal token JWT.
+     * 
+     * @param token Il token JWT da cui estrarre il ruolo.
+     * @return Il ruolo come stringa.
+     */
     public String extractRole(String token) {
         return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
+    /**
+     * Estrae la data di scadenza dal token JWT.
+     * 
+     * @param token Il token JWT da cui estrarre la data di scadenza.
+     * @return La data di scadenza come oggetto Date.
+     */
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    /**
+     * Verifica se il token JWT è scaduto.
+     * 
+     * @param token Il token JWT da verificare.
+     * @return true se il token è scaduto, false altrimenti.
+     */
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
+    /**
+     * Verifica se il token JWT è valido.
+     * 
+     * @param token Il token JWT da verificare.
+     * @return true se il token è valido, false altrimenti.
+     */    
     public boolean isTokenValid (String token) {
         return !isTokenExpired(token) && !invalidatedTokens.contains(token);
     }
 
+    /**
+     * Genera un nuovo token JWT con i dati dell'utente.
+     * 
+     * @param userId L'ID dell'utente.
+     * @param username Il nome utente.
+     * @param role Il ruolo dell'utente.
+     * @return Un oggetto TokenJWTDto contenente il token JWT generato.
+     */
     public TokenJWTDto generateToken (String userId, String username, String role) {
         Map<String, Object> claims = new HashMap<>();
         
@@ -122,14 +184,32 @@ public class TokenJWTService {
         return new TokenJWTDto(token);
     }
 
+    /**
+     * Analizza un token JWT e restituisce un oggetto TokenJWTDto.
+     * 
+     * @param token Il token JWT da analizzare.
+     * @return Un oggetto TokenJWTDto contenente il token JWT.
+     */
     public TokenJWTDto parseToken(String token) {
         return new TokenJWTDto(token);
     }
 
+    /**
+     * Invalida un token aggiungendolo all'insieme di token invalidati.
+     * 
+     * @param token Il token da invalidare.
+     */
     public void invalidateToken(String token) {
         invalidatedTokens.add(token);
     }
 
+    /**
+     * Effettua il refresh di un token JWT, generando un nuovo token con gli stessi dati dell'utente.
+     * 
+     * @param token Il token JWT da aggiornare.
+     * @return Un nuovo oggetto TokenJWTDto contenente il token JWT aggiornato.
+     * @throws RuntimeException Se il token è già stato invalidato.
+     */
     public TokenJWTDto refreshToken(String token) throws RuntimeException {
         if (invalidatedTokens.contains(token)) {
             throw new RuntimeException("Token già invalidato, non è possibile effettuare il refresh");

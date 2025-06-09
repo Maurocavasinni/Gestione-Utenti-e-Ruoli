@@ -27,6 +27,11 @@ public class RoleService {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Restituisce tutti i ruoli presenti nel sistema.
+     *
+     * @return Una lista di RoleDto che rappresentano i ruoli.
+     */
     public List<RoleDto> getAllRoles() {
         List<Role> roles = roleRepository.findAll();
         return roles.stream()
@@ -34,11 +39,24 @@ public class RoleService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Trova un ruolo per ID nel database.
+     *
+     * @param roleId L'ID del ruolo da cercare.
+     * @return Un RoleDto se il ruolo esiste, altrimenti null.
+     */
     public RoleDto findById(String roleId) {
         Optional<Role> role = roleRepository.findById(roleId);
         return role.map(roleConverter::toDto).orElse(null);
     }
 
+    /**
+     * Crea un ruolo se non esiste già nel database.
+     * 
+     * @param id L'ID del ruolo da creare.
+     * @param nome Il nome del ruolo.
+     * @param descrizione La descrizione del ruolo.
+     */
     private void createRoleIfNotExists(String id, String nome, String descrizione) {
         if (!roleRepository.existsById(id)) {
             Role role = new Role(id, nome, descrizione);
@@ -46,6 +64,10 @@ public class RoleService {
         }
     }
 
+    /**
+     * Inizializza i ruoli di base nel database.
+     * Questo metodo viene chiamato in automatico una volta all'avvio dell'applicazione.
+     */
     @PostConstruct
     public void initializeRoles() {
         createRoleIfNotExists("sadmin", "SUPER_ADMIN", "Amministratore di sistema con tutti i privilegi");
@@ -54,6 +76,13 @@ public class RoleService {
         createRoleIfNotExists("student", "STUDENTE", "Ruolo base, riservato agli studenti");
     }
 
+    /**
+     * Controlla se l'utente ha il ruolo richiesto per eseguire un'operazione.
+     *
+     * @param token Il token JWT dell'utente.
+     * @param role Il ruolo richiesto per l'operazione.
+     * @throws UnknownUserException Se l'utente non esiste o il token non è valido.
+     */
     public void checkRole(String token, RoleLevelEnum role) throws UnknownUserException {
         if (!tokenService.isTokenValid(token)) {
             throw new SecurityException("Token non valido o scaduto");
@@ -66,10 +95,25 @@ public class RoleService {
         }
     }
 
+    /**
+     * Controlla internamente se l'utente ha i permessi per eseguire un'operazione.
+     *
+     * @param userId L'ID dell'utente.
+     * @param role Il ruolo richiesto per l'operazione.
+     * @throws UnknownUserException Se l'utente non esiste o il token non è valido.
+     */
     private boolean hasPermission(String userRole, RoleLevelEnum requiredRole) throws IllegalArgumentException {
         return RoleLevelEnum.fromRoleName(userRole).getLevel() >= requiredRole.getLevel();
     }
 
+    /**
+     * Assegna un ruolo a un utente.
+     *
+     * @param userId L'ID dell'utente a cui assegnare il ruolo.
+     * @param roleId L'ID del ruolo da assegnare.
+     * @return true se il ruolo è stato assegnato, false se l'utente ha già quel ruolo.
+     * @throws IllegalArgumentException Se l'utente o il ruolo non esistono.
+     */
     public boolean assignRole(String userId, String roleId) throws IllegalArgumentException {
         Optional<User> userTemp = userRepository.findById(userId);
         Optional<Role> roleTemp = roleRepository.findById(roleId);

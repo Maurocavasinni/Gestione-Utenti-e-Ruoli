@@ -16,6 +16,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    
     @PostMapping("/login")
     public ResponseEntity<TokenJWTDto> login(@RequestBody LoginRequestDto loginRequest) {
         try {
@@ -29,7 +30,6 @@ public class AuthController {
         }
     }
 
-    // Valutare se mantenere, il logout normalmente è gestito lato client
     @PostMapping("/logout")
     public void logout (@RequestHeader ("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");

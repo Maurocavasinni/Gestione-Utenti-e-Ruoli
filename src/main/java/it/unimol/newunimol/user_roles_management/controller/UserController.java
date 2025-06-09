@@ -83,7 +83,6 @@ public class UserController {
 
     }
     
-
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@RequestHeader ("Authorization") String authHeader, @PathVariable String id, @RequestBody UserDto request) {
         try {
