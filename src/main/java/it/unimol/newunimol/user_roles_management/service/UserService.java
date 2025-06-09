@@ -28,6 +28,8 @@ public class UserService {
     private UserConverter userConverter;
     @Autowired
     private TokenJWTService tokenJWTService;
+    @Autowired
+    private MessageService messageService;
 
     /**
      * Crea un SuperAdmin se non esiste già.
@@ -49,7 +51,10 @@ public class UserService {
         superAdmin.setRole(superAdminRole.get());
         userRepository.save(superAdmin);
 
-        return userConverter.toDto(superAdmin);
+        UserDto userDto = userConverter.toDto(superAdmin);
+        messageService.publishUserCreated(userDto);
+        
+        return userDto;
     }
 
     /**
@@ -141,7 +146,10 @@ public class UserService {
         user.setPassword(PasswordUtils.hashPassword(userData.getPassword()));
 
         userRepository.save(user);
-        return userConverter.toDto(user);
+        UserDto userDto = userConverter.toDto(user);
+        messageService.publishUserUpdated(userDto);
+
+        return userDto;
     }
 
     /**
@@ -154,6 +162,7 @@ public class UserService {
         Optional<User> user = userRepository.findById(userId);
         if (user.isPresent()) {
             userRepository.delete(user.get());
+            messageService.publishUserDeleted(userId);
             return true;
         }
         return false;
@@ -206,6 +215,9 @@ public class UserService {
         user.setSurname(userData.surname());
 
         userRepository.save(user);
+
+        UserProfileDto profile = getUserProfile(token);
+        messageService.publishProfileUpdated(profile);
     }
 
     /**

@@ -26,6 +26,8 @@ public class RoleService {
     private TokenJWTService tokenService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private MessageService messageService;
 
     /**
      * Restituisce tutti i ruoli presenti nel sistema.
@@ -131,6 +133,7 @@ public class RoleService {
 
         user.setRole(role);
         userRepository.save(user);
+        messageService.publishRoleAssigned(userId, roleId);
         return true;
     }
 }

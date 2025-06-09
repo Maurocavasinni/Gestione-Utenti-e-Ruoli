@@ -1,6 +1,8 @@
 package it.unimol.newunimol.user_roles_management.service;
 
 import it.unimol.newunimol.user_roles_management.dto.TokenJWTDto;
+import it.unimol.newunimol.user_roles_management.dto.UserDto;
+import it.unimol.newunimol.user_roles_management.dto.converter.UserConverter;
 import it.unimol.newunimol.user_roles_management.exceptions.AuthException;
 import it.unimol.newunimol.user_roles_management.exceptions.UnknownUserException;
 import it.unimol.newunimol.user_roles_management.model.User;
@@ -17,6 +19,10 @@ public class AuthService {
     private TokenJWTService tokenService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserConverter userConverter;
+    @Autowired
+    private MessageService messageService;
 
     /**
      * Registra un nuovo utente nel sistema.
@@ -33,6 +39,9 @@ public class AuthService {
             String password = PasswordUtils.hashPassword(user.getPassword());
             user.setPassword(password);
             userRepository.save(user);
+
+            UserDto userDto = userConverter.toDto(user);
+            messageService.publishUserCreated(userDto);
         } catch (Exception e) {
             throw new AuthException(e.getMessage());
         }
