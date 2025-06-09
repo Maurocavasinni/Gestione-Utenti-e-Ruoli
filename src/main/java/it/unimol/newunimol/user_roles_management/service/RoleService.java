@@ -92,20 +92,9 @@ public class RoleService {
 
         String userRole = tokenService.extractRole(token);
 
-        if (!hasPermission(userRole, role)) {
+        if (!(RoleLevelEnum.fromRoleName(userRole).getLevel() >= role.getLevel())) {
             throw new SecurityException("Permessi insufficienti per questa operazione.");
         }
-    }
-
-    /**
-     * Controlla internamente se l'utente ha i permessi per eseguire un'operazione.
-     *
-     * @param userId L'ID dell'utente.
-     * @param role Il ruolo richiesto per l'operazione.
-     * @throws UnknownUserException Se l'utente non esiste o il token non è valido.
-     */
-    private boolean hasPermission(String userRole, RoleLevelEnum requiredRole) throws IllegalArgumentException {
-        return RoleLevelEnum.fromRoleName(userRole).getLevel() >= requiredRole.getLevel();
     }
 
     /**

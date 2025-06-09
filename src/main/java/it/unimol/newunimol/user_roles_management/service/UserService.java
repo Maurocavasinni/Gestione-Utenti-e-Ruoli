@@ -109,7 +109,7 @@ public class UserService {
     }
 
     /**
-     * Trova un utente per nome utente.
+     * Trova un utente per username.
      * 
      * @param username Nome utente da cercare.
      * @return UserDto rappresentante l'utente trovato.
