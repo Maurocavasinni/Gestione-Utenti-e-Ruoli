@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import it.unimol.newunimol.user_roles_management.repository.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +43,27 @@ public class UserService {
         userRepository.save(superAdmin);
 
         return userConverter.toDto(superAdmin);
+    }
+
+    public ArrayList<UserProfileDto> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        ArrayList<UserProfileDto> userProfiles = new ArrayList<>();
+    
+    for (User user : users) {
+        UserProfileDto userProfile = new UserProfileDto(
+            user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getName(),
+            user.getSurname(),
+            user.getRole().getId(),
+            user.getCreationDate(),
+            user.getLastLogin()
+        );
+        userProfiles.add(userProfile);
+    }
+    
+    return userProfiles;
     }
 
     public boolean existsUserId(String id) {

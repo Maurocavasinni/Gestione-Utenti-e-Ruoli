@@ -1,6 +1,6 @@
 package it.unimol.newunimol.user_roles_management.dto;
 
 public record RoleAssignmentDto(
-        String id
+        String roleId
 ) {
 }

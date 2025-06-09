@@ -9,6 +9,10 @@ import it.unimol.newunimol.user_roles_management.service.AuthService;
 import it.unimol.newunimol.user_roles_management.service.RoleService;
 import it.unimol.newunimol.user_roles_management.service.TokenJWTService;
 import it.unimol.newunimol.user_roles_management.util.RoleLevelEnum;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import it.unimol.newunimol.user_roles_management.service.UserService;
 import it.unimol.newunimol.user_roles_management.model.User;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -61,6 +66,23 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping
+    public ResponseEntity<List<UserProfileDto>> getAllUsers(@RequestHeader ("Authorization") String authHeader) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            roleService.checkRole(token, RoleLevelEnum.ADMIN);
+            ArrayList<UserProfileDto> utenti = userService.getAllUsers();
+            return ResponseEntity.ok(utenti);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            System.err.println("Eccezione catturata: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+
+    }
+    
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@RequestHeader ("Authorization") String authHeader, @PathVariable String id, @RequestBody UserDto request) {
@@ -167,7 +189,7 @@ public class UserController {
         try {
             String token = authHeader.replace("Bearer ", "");
             roleService.checkRole(token, RoleLevelEnum.ADMIN);
-            boolean result = roleService.assignRole(id, role.id());
+            boolean result = roleService.assignRole(id, role.roleId());
             return ResponseEntity.ok(result);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
@@ -182,7 +204,7 @@ public class UserController {
         try {
             String token = authHeader.replace("Bearer ", "");
             roleService.checkRole(token, RoleLevelEnum.ADMIN);
-            boolean result = roleService.assignRole(id, role.id());
+            boolean result = roleService.assignRole(id, role.roleId());
             return ResponseEntity.ok(result);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
