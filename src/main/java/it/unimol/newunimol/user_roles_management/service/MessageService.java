@@ -51,8 +51,8 @@ public class MessageService {
         message.put("userId", profile.id());
         message.put("username", profile.username());
         message.put("email", profile.email());
-        message.put("nome", profile.nome());
-        message.put("cognome", profile.cognome());
+        message.put("name", profile.nome());
+        message.put("surname", profile.cognome());
         message.put("timestamp", System.currentTimeMillis());
         rabbitTemplate.convertAndSend(usersExchange, "user.updated", message);
     }

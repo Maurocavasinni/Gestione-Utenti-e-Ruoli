@@ -2,6 +2,7 @@ package it.unimol.newunimol.user_roles_management.dto.converter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import java.util.Random;
 
@@ -23,10 +24,7 @@ public class UserCreationConverter implements Converter<UserCreationDto, User> {
     private static final Random random = new Random();
 
     @Override
-    public User convert(UserCreationDto source) {
-        if (source == null) {
-            return null;
-        }
+    public User convert(@NonNull UserCreationDto source) {
 
         RoleDto ruolo = roleService.findById(source.role());
         String randomId;
