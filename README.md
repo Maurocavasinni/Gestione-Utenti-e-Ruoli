@@ -208,12 +208,12 @@ Nessun permesso specifico per ruolo Super Admin
 | POST | `/api/v1/users/init/superadmin` | **Body:** `{"username": "string", "email": "string", "name": "string", "surname": "string", "password": "string", "role": "string"}` | `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | Crea account Super Admin se assente |
 | POST | `/api/v1/users` | **Header:** Token JWT<br>**Body:** `{"username": "string", "email": "string", "name": "string", "surname": "string", "password": "string", "role": "string"}` | `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | Creazione nuovo utente |
 | GET | `/api/v1/users` | **Header:** Token JWT | `[{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "dataCreazione": 0, "ultimoLogin": 0}]` | Lista tutti gli utenti |
-| GET | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id | `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | Visualizzazione utente |
-| PUT | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id<br>**Body:** `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | Modifica utente |
-| DELETE | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id | boolean | Eliminazione utente |
+| GET | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id utente | `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | Visualizzazione utente |
+| PUT | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id utente<br>**Body:** `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | Modifica utente |
+| DELETE | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id utente | boolean | Eliminazione utente |
 | GET | `/api/v1/roles` | **Header:** Token JWT | `[{"id": "string", "nome": "string", "descrizione": "string"}]` | Lista ruoli disponibili |
-| POST | `/api/v1/users/{id}/roles` | **Header:** Token JWT<br>**PathVariable:** id<br>**Body:** `{"roleId": "string"}` | boolean | Assegna ruolo a utente |
-| PUT | `/api/v1/users/{id}/roles` | **Header:** Token JWT<br>**PathVariable:** id<br>**Body:** `{"roleId": "string"}` | boolean | Aggiorna ruoli utente |
+| POST | `/api/v1/users/{id}/roles` | **Header:** Token JWT<br>**PathVariable:** id utente<br>**Body:** `{"roleId": "string"}` | boolean | Assegna ruolo a utente |
+| PUT | `/api/v1/users/{id}/roles` | **Header:** Token JWT<br>**PathVariable:** id utente<br>**Body:** `{"roleId": "string"}` | boolean | Aggiorna ruoli utente |
 
 ### Docenti+
 
