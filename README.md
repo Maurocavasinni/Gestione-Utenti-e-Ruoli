@@ -62,13 +62,80 @@ Swagger UI: http://localhost:23109/swagger-ui.html
 ## Comunicazione
 
 È stato concordato l'utilizzo di **RabbitMQ** come sistema di messaggistica asincrono.
-Il servizio Gestione Utenti e Ruoli pubblica le modifiche al database come segue:
+Il servizio Gestione Utenti e Ruoli pubblica le modifiche al database tramite 4 routing key specifiche:
 ```
 Exchange: users.exchange (Topic)
 ├── user.created   → Notifica creazione utente
 ├── user.updated   → Notifica aggiornamento utente  
 ├── user.deleted   → Notifica eliminazione utente
 └── role.assigned  → Notifica assegnazione ruolo
+```
+
+### Esempi di Messaggi (Basati su MessageService)
+
+I campi nei messaggi Rabbit corrispondono esattamente ai Dto usati nel sistema.
+Ogni messaggio utilizza il routing key a sè omonimo, eccetto **PROFILE_UPDATED** che sfrutta il routing key di `user.updated`.
+
+#### USER_CREATED
+```json
+{
+  "eventType": "USER_CREATED",
+  "userId": "123456",
+  "username": "m.cavasinni",
+  "email": "m.cavasinni@unimol.it",
+  "name": "Mauro",
+  "surname": "Cavasinni",
+  "roleId": "student",
+  "roleName": "STUDENTE",
+  "timestamp": 1716470423000
+}
+```
+
+#### USER_UPDATED
+```json
+{
+  "eventType": "USER_UPDATED",
+  "userId": "123456",
+  "username": "m.casavinni",
+  "email": "m.casavinni@unimol.it",
+  "name": "Mauro",
+  "surname": "Casavinni",
+  "roleId": "teacher",
+  "roleName": "DOCENTE",
+  "timestamp": 1716470523000
+}
+```
+
+#### USER_DELETED
+```json
+{
+  "eventType": "USER_DELETED",
+  "userId": "123456",
+  "timestamp": 1716470623000
+}
+```
+
+#### ROLE_ASSIGNED
+```json
+{
+  "eventType": "ROLE_ASSIGNED",
+  "userId": "123456",
+  "roleId": "teacher",
+  "timestamp": 1716470723000
+}
+```
+
+#### PROFILE_UPDATED
+```json
+{
+  "eventType": "PROFILE_UPDATED",
+  "userId": "123456",
+  "username": "m.cavasinni",
+  "email": "m.cavasinni@unimol.it",
+  "name": "Mauro",
+  "surname": "Cavasinni",
+  "timestamp": 1716470823000
+}
 ```
 
 ## JWT Authentication
@@ -163,3 +230,34 @@ Nessun permesso specifico per ruolo Docente
 | POST   | /users/reset-password | email                                   | void                                                 | Reset password utente                  |
 | PUT    | /users/change-password | currentPassword, newPassword            | boolean                                              | Modifica password                      |
 
+## TEST
+
+### Admin+
+
+| Metodo | Endpoint | Input | Output | Descrizione |
+|--------|----------|-------|--------|-------------|
+| POST | `/api/v1/users/init/superadmin` | **Body:** `{"username": "string", "email": "string", "password": "string", "nome": "string", "cognome": "string"}` | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "ruolo": {...}, "dataCreazione": 0, "ultimoLogin": 0}` | Crea account Super Admin se assente |
+| POST | `/api/v1/users` | **Header:** Token JWT<br>**Body:** `{"username": "string", "email": "string", "password": "string", "nome": "string", "cognome": "string", "idRuolo": "string"}` | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "ruolo": {...}, "dataCreazione": 0, "ultimoLogin": 0}` | Creazione nuovo utente |
+| GET | `/api/v1/users` | **Header:** Token JWT | `[{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "dataCreazione": 0, "ultimoLogin": 0}]` | Lista tutti gli utenti |
+| GET | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "ruolo": {...}, "dataCreazione": 0, "ultimoLogin": 0}` | Visualizzazione utente |
+| PUT | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id<br>**Body:** `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "ruolo": {...}}` | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "ruolo": {...}, "dataCreazione": 0, "ultimoLogin": 0}` | Modifica utente |
+| DELETE | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id | boolean | Eliminazione utente |
+| GET | `/api/v1/roles` | **Header:** Token JWT | `[{"id": "string", "nome": "string", "descrizione": "string"}]` | Lista ruoli disponibili |
+| POST | `/api/v1/users/{id}/roles` | **Header:** Token JWT<br>**PathVariable:** id<br>**Body:** `{"roleId": "string"}` | boolean | Assegna ruolo a utente |
+| PUT | `/api/v1/users/{id}/roles` | **Header:** Token JWT<br>**PathVariable:** id<br>**Body:** `{"roleId": "string"}` | boolean | Aggiorna ruoli utente |
+
+### Docenti+
+
+Nessun permesso specifico per ruolo Docente
+
+### Permessi Generici
+
+| Metodo | Endpoint | Input | Output | Descrizione |
+|--------|----------|-------|--------|-------------|
+| POST | `/api/v1/auth/login` | **Body:** `{"username": "string", "password": "string"}` | `{"token": "string"}` | Login utente |
+| POST | `/api/v1/auth/logout` | **Header:** Token JWT | void | Logout utente |
+| POST | `/api/v1/auth/refresh-token` | **Header:** Token JWT | `{"token": "string"}` | Rinnovo scadenza token |
+| GET | `/api/v1/users/profile` | **Header:** Token JWT | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "dataCreazione": 0, "ultimoLogin": 0}` | Visualizza profilo utente |
+| PUT | `/api/v1/users/profile` | **Header:** Token JWT<br>**Body:** `{"email": "string", "nome": "string", "cognome": "string"}` | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "dataCreazione": 0, "ultimoLogin": 0}` | Modifica profilo utente |
+| POST | `/api/v1/users/reset-password` | **Header:** Token JWT<br>**Body:** `{"oldPassword": "string", "newPassword": <campo ignorato>}` | void | Reset password utente |
+| PUT | `/api/v1/users/change-password` | **Header:** Token JWT<br>**Body:** `{"oldPassword": "string", "newPassword": "string"}` | boolean | Modifica password |
