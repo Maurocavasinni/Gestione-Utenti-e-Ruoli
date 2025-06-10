@@ -100,7 +100,7 @@ Ogni messaggio utilizza il routing key a sè omonimo, eccetto **PROFILE_UPDATED*
   "email": "m.casavinni@unimol.it",
   "name": "Mauro",
   "surname": "Casavinni",
-  "roleId": "teacher",
+  "roleId": "teach",
   "roleName": "DOCENTE",
   "timestamp": 1716470523000
 }
@@ -120,7 +120,7 @@ Ogni messaggio utilizza il routing key a sè omonimo, eccetto **PROFILE_UPDATED*
 {
   "eventType": "ROLE_ASSIGNED",
   "userId": "123456",
-  "roleId": "teacher",
+  "roleId": "teach",
   "timestamp": 1716470723000
 }
 ```
