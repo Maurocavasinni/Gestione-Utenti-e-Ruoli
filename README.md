@@ -32,7 +32,7 @@ Swagger UI: http://localhost:23109/swagger-ui.html
 
 | Campo         | Tipo    | Note                              |
 |---------------|---------|-----------------------------------|
-| Id            | String  | Identificatore univoco (6 cifre)  |
+| Id            | String  | Matricola (6 cifre)  |
 | Username      | String  |                                   |
 | Email         | String  |                                   |
 | Nome          | String  |                                   |
