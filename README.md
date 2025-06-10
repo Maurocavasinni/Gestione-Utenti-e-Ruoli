@@ -203,44 +203,13 @@ Nessun permesso specifico per ruolo Super Admin
 
 ### Admin+
 
-| Metodo | Endpoint             | Input                                     | Output                                         | Descrizione                         |
-|--------|----------------------|-------------------------------------------|------------------------------------------------|-------------------------------------|
-| POST   | /users/init/superadmin    | username, email, password            | boolean                                 | Crea account Super Admin se assente |
-| POST   | /users               | username, email, password, nome, cognome, idRuolo | boolean                        | Creazione nuovo utente              |
-| PUT    | /users/{id}          | email, nome, cognome                      | username, email, nome, cognome, ruolo | Modifica utente                         |
-| GET    | /users/{id}          | (id nell’URL)                             | IdUtente, username, email, nome, cognome, ruolo, dataCreazione, ultimoLogin | Visualizzazione utente             |
-| DELETE | /users/{id}          | (id nell’URL)                             | boolean                                        | Eliminazione utente                 |
-| GET    | /roles               | void                                      | IdRuolo, nome, descrizione              | Lista ruoli disponibili             |
-| POST   | /users/{id}/roles    | (id ruolo nell’URL)                       | boolean                                        | Assegna ruolo a utente              |
-| PUT    | /users/{id}/roles    | (id ruolo nell’URL)                       | boolean                                        | Aggiorna ruoli utente               |
-
-### Docenti+
-
-Nessun permesso specifico per ruolo Docente
-
-### Permessi Generici
-
-| Metodo | Endpoint               | Input                                  | Output                                               | Descrizione                            |
-|--------|------------------------|----------------------------------------|------------------------------------------------------|----------------------------------------|
-| POST   | /auth/login            | username, password                      | Token JWT                                            | Login utente                           |
-| POST   | /auth/logout           | Token JWT                               | void                                                 | Logout utente                          |
-| POST   | /auth/refresh-token         | Token JWT                               | Token JWT                                            | Rinnovo scadenza token                 |
-| GET    | /users/profile         | Token JWT                               | IdUtente, username, email, nome, cognome, dataCreazione, ultimoLogin | Visualizza profilo utente  |
-| PUT    | /users/profile         | email, nome, cognome                    | Id, username, email, nome, cognome                   | Modifica profilo utente                |
-| POST   | /users/reset-password | email                                   | void                                                 | Reset password utente                  |
-| PUT    | /users/change-password | currentPassword, newPassword            | boolean                                              | Modifica password                      |
-
-## TEST
-
-### Admin+
-
 | Metodo | Endpoint | Input | Output | Descrizione |
 |--------|----------|-------|--------|-------------|
-| POST | `/api/v1/users/init/superadmin` | **Body:** `{"username": "string", "email": "string", "password": "string", "nome": "string", "cognome": "string"}` | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "ruolo": {...}, "dataCreazione": 0, "ultimoLogin": 0}` | Crea account Super Admin se assente |
-| POST | `/api/v1/users` | **Header:** Token JWT<br>**Body:** `{"username": "string", "email": "string", "password": "string", "nome": "string", "cognome": "string", "idRuolo": "string"}` | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "ruolo": {...}, "dataCreazione": 0, "ultimoLogin": 0}` | Creazione nuovo utente |
+| POST | `/api/v1/users/init/superadmin` | **Body:** `{"username": "string", "email": "string", "name": "string", "surname": "string", "password": "string", "role": "string"}` | `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | Crea account Super Admin se assente |
+| POST | `/api/v1/users` | **Header:** Token JWT<br>**Body:** `{"username": "string", "email": "string", "name": "string", "surname": "string", "password": "string", "role": "string"}` | `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | Creazione nuovo utente |
 | GET | `/api/v1/users` | **Header:** Token JWT | `[{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "dataCreazione": 0, "ultimoLogin": 0}]` | Lista tutti gli utenti |
-| GET | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "ruolo": {...}, "dataCreazione": 0, "ultimoLogin": 0}` | Visualizzazione utente |
-| PUT | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id<br>**Body:** `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "ruolo": {...}}` | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "ruolo": {...}, "dataCreazione": 0, "ultimoLogin": 0}` | Modifica utente |
+| GET | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id | `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | Visualizzazione utente |
+| PUT | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id<br>**Body:** `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | `{"id": "string", "username": "string", "email": "string", "name": "string", "surname": "string", "creationDate": 0, "lastLogin": 0 "ruolo": {...}}` | Modifica utente |
 | DELETE | `/api/v1/users/{id}` | **Header:** Token JWT<br>**PathVariable:** id | boolean | Eliminazione utente |
 | GET | `/api/v1/roles` | **Header:** Token JWT | `[{"id": "string", "nome": "string", "descrizione": "string"}]` | Lista ruoli disponibili |
 | POST | `/api/v1/users/{id}/roles` | **Header:** Token JWT<br>**PathVariable:** id<br>**Body:** `{"roleId": "string"}` | boolean | Assegna ruolo a utente |
@@ -257,7 +226,7 @@ Nessun permesso specifico per ruolo Docente
 | POST | `/api/v1/auth/login` | **Body:** `{"username": "string", "password": "string"}` | `{"token": "string"}` | Login utente |
 | POST | `/api/v1/auth/logout` | **Header:** Token JWT | void | Logout utente |
 | POST | `/api/v1/auth/refresh-token` | **Header:** Token JWT | `{"token": "string"}` | Rinnovo scadenza token |
-| GET | `/api/v1/users/profile` | **Header:** Token JWT | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "dataCreazione": 0, "ultimoLogin": 0}` | Visualizza profilo utente |
-| PUT | `/api/v1/users/profile` | **Header:** Token JWT<br>**Body:** `{"email": "string", "nome": "string", "cognome": "string"}` | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "dataCreazione": 0, "ultimoLogin": 0}` | Modifica profilo utente |
+| GET | `/api/v1/users/profile` | **Header:** Token JWT | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "nomeRuolo": "string", "dataCreazione": 0, "ultimoLogin": 0}` | Visualizza profilo utente |
+| PUT | `/api/v1/users/profile` | **Header:** Token JWT<br>**Body:** `{"username": "string", "name": "string", "surname": "string"}` | `{"id": "string", "username": "string", "email": "string", "nome": "string", "cognome": "string", "nomeRuolo": "string", "dataCreazione": 0, "ultimoLogin": 0}` | Modifica profilo utente |
 | POST | `/api/v1/users/reset-password` | **Header:** Token JWT<br>**Body:** `{"oldPassword": "string", "newPassword": <campo ignorato>}` | void | Reset password utente |
 | PUT | `/api/v1/users/change-password` | **Header:** Token JWT<br>**Body:** `{"oldPassword": "string", "newPassword": "string"}` | boolean | Modifica password |
