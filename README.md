@@ -71,7 +71,7 @@ Exchange: users.exchange (Topic)
 └── role.assigned  → Notifica assegnazione ruolo
 ```
 
-### Esempi di Messaggi (Basati su MessageService)
+### Esempi di Messaggi
 
 I campi nei messaggi Rabbit corrispondono esattamente ai Dto usati nel sistema.
 Ogni messaggio utilizza il routing key a sè omonimo, eccetto **PROFILE_UPDATED** che sfrutta il routing key di `user.updated`.
