@@ -18,7 +18,7 @@ import it.unimol.newunimol.user_roles_management.exceptions.AuthException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@Tag(name = "Authentication", description = "API per l'autenticazione degli utenti")
+@Tag(name = "Authentication", description = "API per l'autenticazione")
 public class AuthController {
     @Autowired
     private AuthService authService;
