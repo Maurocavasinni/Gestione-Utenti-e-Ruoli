@@ -1,0 +1,50 @@
+# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
+# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
+
+name: Maven Automatic Releases
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 21
+      if: steps.check.outputs.should_release == 'true'
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
+
+    - name: Check commit message and extract version
+      run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if [[ $COMMIT_MSG =~ ^(Update|Release)\ v\.([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "version=${BASH_REMATCH[2]}" >> $GITHUB_OUTPUT
+          else
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          fi
+
+    - name: Build with Maven
+      if: steps.check.outputs.should_release == 'true'
+      run: mvn -B package --file pom.xml
+
+    - name: Create Release
+      if: steps.check.outputs.should_release == 'true'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.check.outputs.version }}
+        name: Release v${{ steps.check.outputs.version }}
+        files: target/*.jar
+      env:
+        GITHUB_TOKEN: ${{ github.token }}

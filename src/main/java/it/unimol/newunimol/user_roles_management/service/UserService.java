@@ -39,6 +39,16 @@ public class UserService {
      * @throws InvalidRequestException Se un SuperAdmin esiste già.
      */
     public UserDto createSuperAdminIfNotExists(UserCreationDto request) throws InvalidRequestException {
+        if (request == null || 
+            request.username() == null || request.username().isEmpty() ||
+            request.email() == null || request.email().isEmpty() ||
+            request.name() == null || request.name().isEmpty() ||
+            request.surname() == null || request.surname().isEmpty() ||
+            request.password() == null || request.password().isEmpty() ||
+            request.role() == null || request.role().isEmpty()) {
+            throw new InvalidRequestException("Tutti i campi sono obbligatori");
+        }
+        
         List<User> superAdmins = userRepository.findByNomeRuolo("SUPER_ADMIN");
         if (!superAdmins.isEmpty()) {
             throw new InvalidRequestException("SuperAdmin già esistente");
@@ -88,7 +98,11 @@ public class UserService {
      * @param id ID dell'utente da verificare.
      * @return true se l'utente esiste, false altrimenti.
      */
-    public boolean existsUserId(String id) {
+    public boolean existsUserId(String id) throws InvalidRequestException {
+        if (id == null || id.isEmpty()) {
+            throw new InvalidRequestException("ID non può essere vuoto.");
+        }
+
         Optional<User> user = userRepository.findById(id);
         return user.isPresent();
     }
@@ -101,6 +115,10 @@ public class UserService {
      * @throws UnknownUserException Se l'utente non viene trovato.
      */
     public UserDto findByUserId(String id) throws UnknownUserException {
+        if (id == null || id.isEmpty()) {
+            throw new UnknownUserException("ID non può essere vuoto.");
+        }
+        
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             throw new UnknownUserException("Username non trovato");
@@ -116,6 +134,10 @@ public class UserService {
      * @throws UnknownUserException Se l'utente non viene trovato.
      */
     public UserDto findByUsername(String username) throws UnknownUserException {
+        if (username == null || username.isEmpty()) {
+            throw new UnknownUserException("Username non può essere vuoto.");
+        }
+        
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
             throw new UnknownUserException("Username non trovato");
@@ -132,6 +154,10 @@ public class UserService {
      * @throws UnknownUserException Se l'utente non viene trovato.
      */
     public UserDto updateUser(String userId, User userData) throws UnknownUserException {
+        if (userId == null || userId.isEmpty()) {
+            throw new UnknownUserException("ID non può essere vuoto.");
+        }
+        
         Optional<User> userTemp = userRepository.findById(userId);
         if (userTemp.isEmpty()) {
             throw new UnknownUserException("Utente non trovato.");
@@ -158,9 +184,15 @@ public class UserService {
      * @param userId ID dell'utente da eliminare.
      * @return true se l'utente è stato eliminato, false se l'utente non esiste.
      */
-    public boolean deleteUser(String userId) {
+    public boolean deleteUser(String userId) throws UnknownUserException {
+        if (userId == null || userId.isEmpty()) {
+            throw new UnknownUserException("ID non può essere vuoto.");
+        }
+
         Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
+        if (user == null || user.isEmpty()) {
+            throw new UnknownUserException("Utente non trovato.");
+        } else if (user.isPresent()) {
             userRepository.delete(user.get());
             messageService.publishUserDeleted(userId);
             return true;
@@ -175,8 +207,12 @@ public class UserService {
      * @return UserProfileDto contenente i dettagli del profilo utente.
      * @throws UnknownUserException Se l'utente non viene trovato.
      */
-    public UserProfileDto getUserProfile(String token) throws UnknownUserException {
+    public UserProfileDto getUserProfile(String token) throws UnknownUserException {        
         String userId = tokenJWTService.extractUserId(token);
+        
+        if (userId == null || userId.isEmpty()) {
+            throw new UnknownUserException("ID non può essere vuoto.");
+        }
         Optional<User> userTemp = userRepository.findById(userId);
         if (userTemp.isEmpty()) {
             throw new UnknownUserException("Utente non trovato");
@@ -204,6 +240,10 @@ public class UserService {
      */
     public void updateUserProfile(String token, UserUpdaterDto userData) throws UnknownUserException {
         String userId = tokenJWTService.extractUserId(token);
+        if (userId == null || userId.isEmpty()) {
+            throw new UnknownUserException("ID non può essere vuoto.");
+        }
+
         Optional<User> userTemp = userRepository.findById(userId);
         if (userTemp.isEmpty()) {
             throw new UnknownUserException("Utente non trovato");
@@ -230,6 +270,10 @@ public class UserService {
      */
     public void resetPassword(String token, String oldPassword) throws UnknownUserException {
         String userId = tokenJWTService.extractUserId(token);
+        if (userId == null || userId.isEmpty()) {
+            throw new UnknownUserException("ID non può essere vuoto.");
+        }
+
         Optional<User> userTemp = userRepository.findById(userId);
         if (userTemp.isEmpty()) {
             throw new UnknownUserException("Utente non trovato");
@@ -256,6 +300,10 @@ public class UserService {
      */
     public boolean changePassword(String token, String oldPassword, String newPassword) throws UnknownUserException {
         String userId = tokenJWTService.extractUserId(token);
+        if (userId == null || userId.isEmpty()) {
+            throw new UnknownUserException("ID non può essere vuoto.");
+        }
+
         Optional<User> userTemp = userRepository.findById(userId);
         if (userTemp.isEmpty()) {
             throw new UnknownUserException("Utente non trovato");

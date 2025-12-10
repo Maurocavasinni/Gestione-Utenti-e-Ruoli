@@ -1,0 +1,8 @@
+target/
+.vscode/
+.env
+.git/
+.gitignore
+*.md
+LICENSE
+.mvn/wrapper/maven-wrapper.jar

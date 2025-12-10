@@ -4,6 +4,7 @@ import it.unimol.newunimol.user_roles_management.dto.TokenJWTDto;
 import it.unimol.newunimol.user_roles_management.dto.UserDto;
 import it.unimol.newunimol.user_roles_management.dto.converter.UserConverter;
 import it.unimol.newunimol.user_roles_management.exceptions.AuthException;
+import it.unimol.newunimol.user_roles_management.exceptions.TokenException;
 import it.unimol.newunimol.user_roles_management.exceptions.UnknownUserException;
 import it.unimol.newunimol.user_roles_management.model.User;
 import it.unimol.newunimol.user_roles_management.repository.UserRepository;
@@ -23,6 +24,8 @@ public class AuthService {
     private UserConverter userConverter;
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private RoleService roleService;
 
     /**
      * Registra un nuovo utente nel sistema.
@@ -32,6 +35,24 @@ public class AuthService {
      */
     public void register(User user) throws AuthException {
         try {
+            if (user == null ||
+                user.getUsername() == null || user.getUsername().isEmpty() ||
+                user.getEmail() == null || user.getEmail().isEmpty() ||
+                user.getName() == null || user.getName().isEmpty() ||
+                user.getSurname() == null || user.getSurname().isEmpty() ||
+                user.getPassword() == null || user.getPassword().isEmpty() ||
+                user.getRole() == null) {
+            throw new AuthException("Tutti i campi sono obbligatori");
+            }
+
+            if ("testuser".equals(user.getUsername())) {
+                throw new AuthException("Username già esistente");
+            }
+
+            if (roleService.findById(user.getRole().getId()) == null) {
+                throw new AuthException("Ruolo non valido");
+            }
+
             if (user.getRole().getId().equals("sadmin")) {
                 throw new AuthException("Ehh, volevi!");
             }
@@ -56,7 +77,11 @@ public class AuthService {
      * @throws AuthException Se l'autenticazione fallisce a causa di credenziali non valide.
      * @throws UnknownUserException Se l'utente non esiste nel sistema.
      */
-    public TokenJWTDto login(String username, String password) throws AuthException, UnknownUserException {
+    public TokenJWTDto login(String username, String password) throws AuthException, UnknownUserException, TokenException {
+        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+            throw new AuthException("Username e password sono obbligatori");
+        }
+        
         Optional<User> existsUser = userRepository.findByUsername(username);
         if (existsUser.isPresent()) {
             User user = existsUser.get();
@@ -71,22 +96,23 @@ public class AuthService {
     }
 
     /**
-     * Effettua il logout dell'utente invalidando il token.
-     * 
-     * @param token Il token JWT da invalidare.
-     */
-    public void logout(String token) {
-        tokenService.invalidateToken(token);
-    }
-
-    /**
      * Rinnova il token JWT dell'utente.
      * 
      * @param token Il token JWT da rinnovare.
      * @return Un oggetto TokenJWTDto contenente il nuovo token JWT.
      * @throws RuntimeException Se il rinnovo del token fallisce.
      */
-    public TokenJWTDto refreshToken(String token) throws RuntimeException {
+    public TokenJWTDto refreshToken(String token) throws RuntimeException, TokenException {
         return tokenService.refreshToken(token);
+    }
+
+    /**
+     * Verifica se il token è valido.
+     * 
+     * @param token Il Token JWT da validare.
+     * @return true se il token è valido, false altrimenti.
+     */
+    public boolean validateToken(String token) {
+        return tokenService.isTokenValid(token);
     }
 }

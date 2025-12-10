@@ -48,6 +48,10 @@ public class RoleService {
      * @return Un RoleDto se il ruolo esiste, altrimenti null.
      */
     public RoleDto findById(String roleId) {
+        if (roleId == null || roleId.isEmpty()) {
+            return null;
+        }
+
         Optional<Role> role = roleRepository.findById(roleId);
         return role.map(roleConverter::toDto).orElse(null);
     }
@@ -58,8 +62,13 @@ public class RoleService {
      * @param id L'ID del ruolo da creare.
      * @param nome Il nome del ruolo.
      * @param descrizione La descrizione del ruolo.
+     * @throws IllegalArgumentException Se l'id del ruolo non esiste.
      */
-    private void createRoleIfNotExists(String id, String nome, String descrizione) {
+    private void createRoleIfNotExists(String id, String nome, String descrizione) throws IllegalArgumentException {
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Il ruolo non può avere id nullo.");
+        }
+        
         if (!roleRepository.existsById(id)) {
             Role role = new Role(id, nome, descrizione);
             roleRepository.save(role);
@@ -71,7 +80,7 @@ public class RoleService {
      * Questo metodo viene chiamato in automatico una volta all'avvio dell'applicazione.
      */
     @PostConstruct
-    public void initializeRoles() {
+    public void initializeRoles() throws IllegalArgumentException {
         createRoleIfNotExists("sadmin", "SUPER_ADMIN", "Amministratore di sistema con tutti i privilegi");
         createRoleIfNotExists("admin", "ADMIN", "Amministratore con privilegi di gestione utenti");
         createRoleIfNotExists("teach", "DOCENTE", "Ruolo con permessi aggiuntivi per i docenti");
@@ -106,6 +115,10 @@ public class RoleService {
      * @throws IllegalArgumentException Se l'utente o il ruolo non esistono.
      */
     public boolean assignRole(String userId, String roleId) throws IllegalArgumentException {
+        if (userId == null || userId.isEmpty() || roleId == null || roleId.isEmpty()) {
+            throw new IllegalArgumentException("Id non valido.");
+        }
+        
         Optional<User> userTemp = userRepository.findById(userId);
         Optional<Role> roleTemp = roleRepository.findById(roleId);
 

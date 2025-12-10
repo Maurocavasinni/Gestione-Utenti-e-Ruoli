@@ -16,6 +16,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import it.unimol.newunimol.user_roles_management.dto.TokenJWTDto;
+import it.unimol.newunimol.user_roles_management.exceptions.TokenException;
 
 @Service
 public class TokenJWTService {
@@ -30,8 +31,6 @@ public class TokenJWTService {
 
     private PrivateKey privateKey;
     private PublicKey publicKey;
-
-    private static final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
 
     /**
      * Decifra e restituisce la chiave privata per la firma dei token JWT.
@@ -154,7 +153,7 @@ public class TokenJWTService {
      * @return true se il token è valido, false altrimenti.
      */    
     public boolean isTokenValid (String token) {
-        return !isTokenExpired(token) && !invalidatedTokens.contains(token);
+        return !isTokenExpired(token);
     }
 
     /**
@@ -165,7 +164,11 @@ public class TokenJWTService {
      * @param role Il ruolo dell'utente.
      * @return Un oggetto TokenJWTDto contenente il token JWT generato.
      */
-    public TokenJWTDto generateToken (String userId, String username, String role) {
+    public TokenJWTDto generateToken (String userId, String username, String role) throws TokenException {
+        if (userId == null || username == null || role == null) {
+            throw new TokenException("Token cannot have null fields.");
+        }
+        
         Map<String, Object> claims = new HashMap<>();
         
         long now = System.currentTimeMillis();
@@ -195,32 +198,17 @@ public class TokenJWTService {
     }
 
     /**
-     * Invalida un token aggiungendolo all'insieme di token invalidati.
-     * 
-     * @param token Il token da invalidare.
-     */
-    public void invalidateToken(String token) {
-        invalidatedTokens.add(token);
-    }
-
-    /**
      * Effettua il refresh di un token JWT, generando un nuovo token con gli stessi dati dell'utente.
      * 
      * @param token Il token JWT da aggiornare.
      * @return Un nuovo oggetto TokenJWTDto contenente il token JWT aggiornato.
      * @throws RuntimeException Se il token è già stato invalidato.
      */
-    public TokenJWTDto refreshToken(String token) throws RuntimeException {
-        if (invalidatedTokens.contains(token)) {
-            throw new RuntimeException("Token già invalidato, non è possibile effettuare il refresh");
-        }
-
+    public TokenJWTDto refreshToken(String token) throws RuntimeException, TokenException {
         Claims claims = extractAllClaims(token);
         String userId = claims.getSubject();
         String username = claims.get("username", String.class);
         String role = claims.get("role", String.class);
-
-        invalidateToken(token);
 
         return generateToken(userId, username, role);
     }
