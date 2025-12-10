@@ -27,8 +27,8 @@ jobs:
     - name: Check commit message and extract version
       id: check
       run: |
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          if [[ $COMMIT_MSG =~ ^(Update|Release)\ v\.([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+          COMMIT_MSG=$(git log -1 --pretty=%B | head -n 1))
+          if [[ $COMMIT_MSG =~ ^(Update|Release)\ v\.([0-9]+\.[0-9]+\.[0-9]+) ]]; then
             echo "should_release=true" >> $GITHUB_OUTPUT
             echo "version=${BASH_REMATCH[2]}" >> $GITHUB_OUTPUT
           else
