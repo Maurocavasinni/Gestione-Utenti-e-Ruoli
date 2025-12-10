@@ -106,19 +106,21 @@ class TokenJWTServiceTest {
     }
 
     @Test
-    void testRefreshToken_Success() throws TokenException {
+    void testRefreshToken_Success() throws InterruptedException, TokenException {
         TokenJWTDto originalToken = tokenJWTService.generateToken(testUserId, testUsername, testRole);
         
+        Thread.sleep(1000);
+
         TokenJWTDto result = tokenJWTService.refreshToken(originalToken.token());
 
         
         assertNotNull(result);
         assertNotNull(result.token());
-        assertEquals(originalToken.token(), result.token());
+        assertNotEquals(originalToken.token(), result.token());
     }
 
     @Test
-    void testTokenLifecycle() throws TokenException {
+    void testTokenLifecycle() throws InterruptedException, TokenException {
         // Generate token
         TokenJWTDto tokenDto = tokenJWTService.generateToken(testUserId, testUsername, testRole);
         assertNotNull(tokenDto);
@@ -131,8 +133,10 @@ class TokenJWTServiceTest {
         assertEquals(testUsername, tokenJWTService.extractUsername(tokenDto.token()));
         assertEquals(testRole, tokenJWTService.extractRole(tokenDto.token()));
         
+        Thread.sleep(1000);
+
         // Refresh token
         TokenJWTDto refreshedToken = tokenJWTService.refreshToken(tokenDto.token());
-        assertEquals(tokenDto.token(), refreshedToken.token());
+        assertNotEquals(tokenDto.token(), refreshedToken.token());
     }
 }
