@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    env_file:
+      - ./secrets.env
+    environment:
+      POSTGRES_DB: utenti_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    env_file:
+      - ./secrets.env
+
+  newunimol:
+    build: "."
+    depends_on:
+      - postgres
+      - rabbitmq
+    env_file:
+      - ./secrets.env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/utenti_db
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SERVER_PORT: "23109"
+    ports:
+      - "23109:23109"
+      
+volumes:
+  postgres_data:
+    driver: local
