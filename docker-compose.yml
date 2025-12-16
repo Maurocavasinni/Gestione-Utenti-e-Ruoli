@@ -7,11 +7,26 @@ services:
       POSTGRES_DB: utenti_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+        delay: 5s
 
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
     env_file:
       - ./secrets.env
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
 
   newunimol:
     build: "."
@@ -23,9 +38,14 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/utenti_db
       SPRING_RABBITMQ_HOST: rabbitmq
-      SERVER_PORT: "23109"
     ports:
       - "23109:23109"
+    deploy:
+      replicas: 5
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
       
 volumes:
   postgres_data:
