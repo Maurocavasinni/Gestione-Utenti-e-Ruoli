@@ -17,7 +17,7 @@ public class OpenAPIConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Users and Roles API")
-                        .version("1.0.0")
+                        .version("1.0.1.1")
                         .description("Microservizio per la gestione degli utenti e dei ruoli"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new io.swagger.v3.oas.models.Components()
