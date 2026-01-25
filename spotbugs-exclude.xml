@@ -12,16 +12,4 @@
     <Match>
         <Class name="~.*Test"/>
     </Match>
-    <Match>
-        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
-        <Class name="~.*Controller"/>
-    </Match>
-    <Match>
-        <Bug pattern="SE_NO_SERIALVERSIONID"/>
-    </Match>
-    <Match>
-        <Class name="it.unimol.newunimol.user_roles_management.service.TokenJWTService"/>
-        <Method name="generateToken"/>
-        <Bug pattern="NP_EQUALS_SHOULD_HANDLE_NULL_ARGUMENT"/>
-    </Match>
 </FindBugsFilter>

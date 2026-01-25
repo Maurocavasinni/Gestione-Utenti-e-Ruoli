@@ -3,7 +3,6 @@ package it.unimol.newunimol.user_roles_management.service;
 import it.unimol.newunimol.user_roles_management.dto.*;
 import it.unimol.newunimol.user_roles_management.dto.converter.UserConverter;
 import it.unimol.newunimol.user_roles_management.exceptions.AuthException;
-import it.unimol.newunimol.user_roles_management.exceptions.InvalidRequestException;
 import it.unimol.newunimol.user_roles_management.exceptions.TokenException;
 import it.unimol.newunimol.user_roles_management.exceptions.UnknownUserException;
 import it.unimol.newunimol.user_roles_management.model.Role;

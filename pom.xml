@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>it.unimol</groupId>
 	<artifactId>newunimol</artifactId>
-	<version>1.0.1.1-SNAPSHOT</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<name>newunimol</name>
 	<description>Ambiente per il progetto Gestione Utenti e Ruoli</description>
 	<url/>
@@ -169,6 +169,13 @@
 							<goal>check</goal>
 						</goals>
 					</execution>
+					<execution>
+						<id>checkstyle-report</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>checkstyle</goal>
+						</goals>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -181,6 +188,8 @@
 					<failOnError>false</failOnError>
 					<excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
 					<maxHeap>2048</maxHeap>
+					<xmlOutput>true</xmlOutput>
+        			<htmlOutput>true</htmlOutput>
 				</configuration>
 				<executions>
 					<execution>
