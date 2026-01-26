@@ -1,4 +1,4 @@
-FROM maven:4.0.0-rc-5-eclipse-temurin-21 AS build
+FROM maven:4.0.0-rc-5-eclipse-temurin-21 AS source
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /newunimol
 
-COPY --from=build /app/target/newunimol-1.0.2-SNAPSHOT.jar newunimol.jar
+COPY --from=source /app/target/newunimol-1.0.2-SNAPSHOT.jar newunimol.jar
 
 EXPOSE 23109
 
