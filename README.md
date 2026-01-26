@@ -1,5 +1,8 @@
 # Documentazione
 
+[![Java CI with Maven](https://github.com/Maurocavasinni/Gestione-Utenti-e-Ruoli/actions/workflows/maven.yml/badge.svg)](https://github.com/Maurocavasinni/Gestione-Utenti-e-Ruoli/actions/workflows/maven.yml)
+[![codecov](https://codecov.io/gh/Maurocavasinni/Gestione-Utenti-e-Ruoli/branch/main/graph/badge.svg)](https://codecov.io/gh/Maurocavasinni/Gestione-Utenti-e-Ruoli)
+
 ## Panoramica
 
 Il servizio **Gestione Utenti e Ruoli** si occupa dell'autenticazione degli utenti e della gestione dei ruoli nella piattaforma universitaria. Consente di creare utenti, assegnare ruoli, gestire il login e modificare i profili.
