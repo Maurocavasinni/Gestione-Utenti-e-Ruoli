@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    env_file:
+      - ./secrets.env
+    environment:
+      POSTGRES_DB: utenti_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    env_file:
+      - ./secrets.env
+    ports:
+      - "15672:15672"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+  newunimol:
+    build: "."
+    depends_on:
+      - postgres
+      - rabbitmq
+    env_file:
+      - ./secrets.env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/utenti_db
+      SPRING_RABBITMQ_HOST: rabbitmq
+    ports:
+      - "23109:23109"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      
+volumes:
+  postgres_data:
+    driver: local
