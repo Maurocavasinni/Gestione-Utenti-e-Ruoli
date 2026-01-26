@@ -19,6 +19,8 @@ services:
     image: rabbitmq:3.13-management-alpine
     env_file:
       - ./secrets.env
+    ports:
+      - "15672:15672"
     deploy:
       replicas: 1
       placement:
